@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Controller
 @Slf4j
 @RequestMapping("/rule-controller")
-public class TestController {
+public class ZuulTestController {
 
     @PostMapping("/**")
     public String test2(HttpServletRequest request){

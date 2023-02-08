@@ -13,7 +13,7 @@ import java.util.Map;
  * @date 2023/2/8
  */
 @FeignClient("rule-liteflow")
-public interface TestFeignClient {
+public interface RuleFeignClient {
     @PostMapping("/api-a/rule")
     String ruleFlow(@RequestBody Map<String, String> reqMap);
 }

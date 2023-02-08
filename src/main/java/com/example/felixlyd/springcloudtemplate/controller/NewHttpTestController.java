@@ -1,8 +1,6 @@
 package com.example.felixlyd.springcloudtemplate.controller;
 
-import com.example.felixlyd.springcloudtemplate.feign.TestFeignClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 测试zuul转发
+ * 新发起http请求通过zuul转发
  *
  * @author : liuyaodong
  * @date 2023/2/7
@@ -24,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 @RequestMapping("/rule-controller3")
-public class Test3Controller {
+public class NewHttpTestController {
 
     @PostMapping("/**")
     public String test2(HttpServletRequest request, @RequestBody Map<String, String> reqMap){
