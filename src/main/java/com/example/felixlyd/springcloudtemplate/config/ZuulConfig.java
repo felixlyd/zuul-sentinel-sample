@@ -1,7 +1,7 @@
 package com.example.felixlyd.springcloudtemplate.config;
 
-import com.example.felixlyd.springcloudtemplate.config.filter.filter.AdapterPostFilter;
-import com.example.felixlyd.springcloudtemplate.config.filter.filter.AdapterPreFilter;
+import com.example.felixlyd.springcloudtemplate.config.filter.AdapterPostFilter;
+import com.example.felixlyd.springcloudtemplate.config.filter.AdapterPreFilter;
 import com.netflix.zuul.ZuulFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

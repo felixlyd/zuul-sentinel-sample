@@ -1,4 +1,4 @@
-package com.example.felixlyd.springcloudtemplate.config.filter.filter;
+package com.example.felixlyd.springcloudtemplate.config.filter;
 
 import com.alibaba.csp.sentinel.adapter.gateway.zuul.filters.SentinelZuulPostFilter;
 import com.netflix.zuul.exception.ZuulException;
