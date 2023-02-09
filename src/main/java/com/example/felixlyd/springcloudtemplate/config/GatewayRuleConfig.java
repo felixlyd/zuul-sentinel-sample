@@ -41,8 +41,8 @@ public class GatewayRuleConfig {
         // It's recommended to leverage dynamic data source or the Sentinel dashboard to push the rules.
         initCustomizedApis();
         initGatewayRules();
-        initDegradeRules();
-        initSystemRule();
+//        initDegradeRules();
+//        initSystemRule();
     }
 
     private void initCustomizedApis() {

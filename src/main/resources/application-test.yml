@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: zuul-sentinel-template
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8888
+        port: 8720
+      # sentinel是懒加载机制，只有访问过一次的资源才会被监控
+      # 取消控制台懒加载，项目启动即连接Sentinel
+      eager: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8080/eureka/
+
+server:
+  port: 8082
+
+zuul:
+  routes:
+#    # 方式1
+#    a-server:
+#      path: /rule/*
+#      service-id: rule-liteflow
+#    # 方式2
+#    rule-liteflow:
+#      path: /rule/*
+    # 方式3
+    rule-liteflow: /rule/**
