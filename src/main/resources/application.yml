@@ -9,6 +9,11 @@ spring:
       # sentinel是懒加载机制，只有访问过一次的资源才会被监控
       # 取消控制台懒加载，项目启动即连接Sentinel
       eager: true
+      zuul:
+        order:
+          pre: 10000
+          post: 1000
+          error: -1
 
 eureka:
   client:
@@ -20,12 +25,18 @@ server:
 
 zuul:
   routes:
-#    # 方式1
-#    a-server:
-#      path: /rule/*
-#      service-id: rule-liteflow
+    # 方式1
+    a-server:
+      path: /rule/**
+      service-id: rule-liteflow
+    b-server:
+      path: /rule2/**
+      service-id: rule-liteflow
 #    # 方式2
 #    rule-liteflow:
-#      path: /rule/*
-    # 方式3
-    rule-liteflow: /rule/**
+#      path: /rule/**
+#    # 方式3
+#    rule-liteflow: /rule/**
+security-filter:
+  pre: 20000
+  post: 500
