@@ -28,6 +28,20 @@ public interface SmService {
     String sm4Decrypt(String encryptStr);
 
     /**
+     * sm4算法加密 编码基于Base64(urlSafe)
+     * @param originStr 原始字符串
+     * @return 加密的字符串
+     */
+    String sm4EncryptUrlSafe(String originStr);
+
+    /**
+     * sm4算法解密 需Base64解码(urlSafe)
+     * @param encryptStr 加密的字符串
+     * @return 解密的字符串
+     */
+    String sm4DecryptUrlSafe(String encryptStr);
+
+    /**
      * sm2验签 需Base64解码
      * @param digest 摘要
      * @param sign 签名

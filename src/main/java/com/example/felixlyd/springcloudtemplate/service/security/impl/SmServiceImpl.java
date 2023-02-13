@@ -60,6 +60,30 @@ public class SmServiceImpl implements SmService {
     }
 
     /**
+     * sm4算法加密 编码基于Base64(urlSafe)
+     *
+     * @param originStr 加密的字符串
+     * @return 解密的字符串
+     */
+    @Override
+    public String sm4EncryptUrlSafe(String originStr) {
+        byte[] encryptBytes = sm4.encrypt(originStr.getBytes(StandardCharsets.UTF_8));
+        return new String(Base64.getUrlEncoder().encode(encryptBytes), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * sm4算法解密 需Base64解码(urlSafe)
+     * @param encryptStr 加密的字符串
+     * @return 解密的字符串
+     */
+    @Override
+    public String sm4DecryptUrlSafe(String encryptStr) {
+        byte[] encryptBytes = Base64.getUrlDecoder().decode(encryptStr.getBytes(StandardCharsets.UTF_8));
+        byte[] originBytes = sm4.decrypt(encryptBytes);
+        return new String(originBytes, StandardCharsets.UTF_8);
+    }
+
+    /**
      * sm2验签 需Base64解码
      *
      * @param digest 摘要

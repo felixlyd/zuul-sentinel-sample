@@ -6,6 +6,8 @@ import com.alibaba.csp.sentinel.adapter.gateway.zuul.fallback.ZuulBlockFallbackP
 import com.alibaba.csp.sentinel.util.StringUtil;
 import com.example.felixlyd.springcloudtemplate.service.security.DataReplayDefenseService;
 import com.example.felixlyd.springcloudtemplate.service.security.SmService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -16,7 +18,10 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
+import java.security.AccessControlException;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * 解密请求报文、验签、防重放
@@ -33,6 +38,9 @@ public class SecurityPreFilter extends ZuulFilter {
 
     @Autowired
     private SmService smService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Value("${security-filter.pre:20000}")
     private int preFilterOrder;
@@ -54,29 +62,41 @@ public class SecurityPreFilter extends ZuulFilter {
 
     @Override
     public Object run() throws ZuulException {
-        // 1. 获取Request对象
+        // 1. 获取请求上下文
         RequestContext requestContext = RequestContext.getCurrentContext();
-        HttpServletRequest request =requestContext.getRequest();
         String routeId = (String)requestContext.get("proxy");
         try{
             if(StringUtil.equals(routeId,"a-server")){
-                log.info("解密--");
                 HashMap<String , Object > map = new HashMap<>(5);
                 map.put("nonce", "5");
                 map.put("timestamp",String.valueOf(System.currentTimeMillis()));
-                boolean status = dataReplayDefenseService.isNonceLegal((String) map.get("nonce"));
-                boolean status2 = dataReplayDefenseService.isTimeStampLegal(Long.valueOf((String) map.get("timestamp")));
-                log.info(String.valueOf(status));
-                String originStr = smService.joinRequestMap(map);
-                String sm4StrE = smService.sm4Encrypt(originStr);
-                String sm4StrD = smService.sm4Decrypt(sm4StrE);
-                String digest = smService.sm3Encrypt(originStr);
-                String digest2 = smService.sm3Encrypt(map);
-                String sign = smService.sm2Sign(originStr);
-                String sign2 = smService.sm2Sign(map);
-                boolean ok = smService.sm2VerifySign(digest, sign);
-                boolean ok2 = smService.sm2VerifySign(map, sign2);
-                log.info(String.valueOf(ok2));
+                String sign = smService.sm2Sign(map);
+                map.put("sign", sign);
+                String sm4StrE = smService.sm4EncryptUrlSafe(objectMapper.writeValueAsString(map));
+                log.info("解密--");
+                HttpServletRequest request =requestContext.getRequest();
+                String encryptRequest = request.getParameter("request");
+                String originRequest = smService.sm4DecryptUrlSafe(encryptRequest);
+                HashMap<String , Object > requestMap = objectMapper.readValue(originRequest, new TypeReference<HashMap<String, Object>>(){});
+                log.info("数据防重放验证--");
+                if(requestMap.containsKey("timestamp")&&requestMap.containsKey("nonce")){
+                    boolean isLegal = dataReplayDefenseService.isNotDataReplay(Long.valueOf((String) requestMap.get("timestamp")),
+                            (String) requestMap.get("nonce"));
+                    if(!isLegal){
+                        throw new AccessControlException("该数据已经处理过，请勿提交重复数据！1");
+                    }
+                }else {
+                    throw new NoSuchElementException("请求报文中缺少timestamp和nonce！");
+                }
+                log.info("签名验证--");
+                if(requestMap.containsKey("sign")){
+                    boolean isSignOk = smService.sm2VerifySign(requestMap, (String) requestMap.get("sign"));
+                    if(!isSignOk){
+                        throw new AccessControlException("数据签名不正确！");
+                    }
+                }else {
+                    throw new NoSuchElementException("请求报文中缺少sign！");
+                }
             }
 
         }catch (Exception e){
