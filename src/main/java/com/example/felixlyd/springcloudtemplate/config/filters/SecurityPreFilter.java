@@ -5,6 +5,7 @@ import com.alibaba.csp.sentinel.adapter.gateway.zuul.fallback.ZuulBlockFallbackM
 import com.alibaba.csp.sentinel.adapter.gateway.zuul.fallback.ZuulBlockFallbackProvider;
 import com.alibaba.csp.sentinel.util.StringUtil;
 import com.example.felixlyd.springcloudtemplate.service.security.DataReplayDefenseService;
+import com.example.felixlyd.springcloudtemplate.service.security.SmService;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -16,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 解密请求报文、验签、防重放
@@ -30,6 +30,9 @@ public class SecurityPreFilter extends ZuulFilter {
 
     @Autowired
     private DataReplayDefenseService dataReplayDefenseService;
+
+    @Autowired
+    private SmService smService;
 
     @Value("${security-filter.pre:20000}")
     private int preFilterOrder;
@@ -58,17 +61,28 @@ public class SecurityPreFilter extends ZuulFilter {
         try{
             if(StringUtil.equals(routeId,"a-server")){
                 log.info("解密--");
-                Map<String , String > map = new HashMap<>(5);
+                HashMap<String , Object > map = new HashMap<>(5);
                 map.put("nonce", "5");
                 map.put("timestamp",String.valueOf(System.currentTimeMillis()));
-                boolean status = dataReplayDefenseService.isNonceLegal(map.get("nonce"));
-                boolean status2 = dataReplayDefenseService.isTimeStampLegal(Long.valueOf(map.get("timestamp")));
+                boolean status = dataReplayDefenseService.isNonceLegal((String) map.get("nonce"));
+                boolean status2 = dataReplayDefenseService.isTimeStampLegal(Long.valueOf((String) map.get("timestamp")));
                 log.info(String.valueOf(status));
+                String originStr = smService.joinRequestMap(map);
+                String sm4StrE = smService.sm4Encrypt(originStr);
+                String sm4StrD = smService.sm4Decrypt(sm4StrE);
+                String digest = smService.sm3Encrypt(originStr);
+                String digest2 = smService.sm3Encrypt(map);
+                String sign = smService.sm2Sign(originStr);
+                String sign2 = smService.sm2Sign(map);
+                boolean ok = smService.sm2VerifySign(digest, sign);
+                boolean ok2 = smService.sm2VerifySign(map, sign2);
+                log.info(String.valueOf(ok2));
             }
 
         }catch (Exception e){
             ZuulBlockFallbackProvider zuulBlockFallbackProvider = ZuulBlockFallbackManager.getFallbackProvider(routeId);
             BlockResponse blockResponse = zuulBlockFallbackProvider.fallbackResponse(routeId, e);
+            log.error(e.getMessage(), e.getCause());
             requestContext.setRouteHost((URL)null);
             requestContext.set("serviceId", (Object)null);
             requestContext.setResponseBody(blockResponse.toString());

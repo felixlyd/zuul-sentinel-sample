@@ -29,3 +29,8 @@ zuul:
 #      path: /rule/*
     # 方式3
     rule-liteflow: /rule/**
+
+sm:
+  sm4key: x/JXskhWPfYyZ2nMbEOmrw==
+  sm2key-private: MIGTAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBHkwdwIBAQQgh8tf2S0bMHgiwd44rWOBqT6PgdVtnaVYYP7K0H8RNWmgCgYIKoEcz1UBgi2hRANCAAQIOtyLKft0zdIF8aPjDqAZbCx67an5i0dhQ1XKU9wrZouP+uS94PjI/Ae8z0WKxlkPx0ufOYmIgsWWCx4Gf0sH
+  sm2key-public: MFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAECDrciyn7dM3SBfGj4w6gGWwseu2p+YtHYUNVylPcK2aLj/rkveD4yPwHvM9FisZZD8dLnzmJiILFlgseBn9LBw==

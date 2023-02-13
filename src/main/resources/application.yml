@@ -40,3 +40,8 @@ zuul:
 security-filter:
   pre: 20000
   post: 500
+
+sm:
+  sm4key: Uh3lIbRvcUfmwTw1/nUFDw==
+  sm2key-private: MIGTAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBHkwdwIBAQQgvsS5cd7wQUfFHx2a6R8EFQCbsMHHNmQdyytFI68aMJigCgYIKoEcz1UBgi2hRANCAARXDLftnGdqzrjxG6Bvc2pynbqtlqfNZrSE+StGCIT9BT98755APnHRWaakTp1RlNuIUOgwliApwkmHvpgUOOu/
+  sm2key-public: MFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAEVwy37Zxnas648Rugb3Nqcp26rZanzWa0hPkrRgiE/QU/fO+eQD5x0VmmpE6dUZTbiFDoMJYgKcJJh76YFDjrvw==
